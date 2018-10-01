@@ -21,6 +21,8 @@ public class EsriNode extends RemovableNode {
         } else {
             listNode = new EsriNode();
         }
+        
+        put(key, listNode);
 
         Set<String> toRemove = listNode.getRemoveSet();
         boolean hasMaps = false;
@@ -32,6 +34,9 @@ public class EsriNode extends RemovableNode {
                 hasMaps = true;
                 DSMap m = elem.toMap();
                 String name = m.getString("name");
+                if (name == null) {
+                    name = m.getString("label");
+                }
                 if (name == null) {
                     warn("Nameless map within a list, this is unexpected");
                 } else {
@@ -54,7 +59,6 @@ public class EsriNode extends RemovableNode {
         for (String name: toRemove) {
             listNode.remove(name);
         }
-        put(key, listNode);
     }
     
     protected void putMapNode(String key, DSMap m) {
@@ -82,6 +86,8 @@ public class EsriNode extends RemovableNode {
             }
         }
         
+        put(key, mapNode);
+        
         Set<String> toRemove = id == null ? mapNode.getRemoveSet() : new HashSet<String>();
         for (Entry entry: m) {
             String name = entry.getKey();
@@ -101,8 +107,6 @@ public class EsriNode extends RemovableNode {
         for (String name: toRemove) {
             mapNode.remove(name);
         }
-        
-        put(key, mapNode);
     }
     
     protected Set<String> getRemoveSet() {
@@ -120,7 +124,11 @@ public class EsriNode extends RemovableNode {
     
     private WebApiNode getApiNode() {
         if (apiNode == null) {
-            apiNode = (WebApiNode) getAncestor(WebApiNode.class);
+            if (this instanceof WebApiNode) {
+                apiNode = (WebApiNode) this;
+            } else {
+                apiNode = (WebApiNode) getAncestor(WebApiNode.class);
+            }
         }
         return apiNode;
     }
