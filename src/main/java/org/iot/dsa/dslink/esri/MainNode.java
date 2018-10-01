@@ -1,7 +1,5 @@
 package org.iot.dsa.dslink.esri;
 
-import java.util.List;
-
 import org.iot.dsa.dslink.DSMainNode;
 import org.iot.dsa.node.DSInfo;
 import org.iot.dsa.node.DSMap;
@@ -11,22 +9,12 @@ import org.iot.dsa.node.action.ActionInvocation;
 import org.iot.dsa.node.action.ActionResult;
 import org.iot.dsa.node.action.DSAction;
 
-import com.esri.arcgisruntime.ArcGISRuntimeException;
-import com.esri.arcgisruntime.data.ServiceFeatureTable;
-import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
-import com.esri.arcgisruntime.loadable.LoadStatus;
-import com.esri.arcgisruntime.portal.Portal;
-import com.esri.arcgisruntime.portal.PortalInfo;
-
 /**
  * The main and only node of this link.
  *
  * @author Aaron Hansen
  */
-public class MainNode extends DSMainNode implements Runnable {
-
-	private Portal portal;
-	private ArcGISMapImageLayer agmil;
+public class MainNode extends DSMainNode {
    
     @Override
     protected void declareDefaults() {
@@ -55,37 +43,10 @@ public class MainNode extends DSMainNode implements Runnable {
     private void addEndpoint(DSMap parameters) {
         String name = parameters.getString("Name");
         String addr = parameters.getString("Address");
-        WebClientProxy clientProxy = new WebClientProxy(addr);
-        WebApiNode n = new WebApiNode(addr, clientProxy, true);
+//        WebClientProxy clientProxy = new WebClientProxy(addr);
+//        WebApiNode n = new WebApiNode(addr, clientProxy, true);
+        MapServiceNode n = new MapServiceNode(addr);
         put(name, n);
     }
-    
-    @Override
-    protected void onStable() {
-    	String url = "https://services8.arcgis.com/WcAJBZ4RHvSFpfLo/ArcGIS/rest/services/Mobile_Map_Export___UC_2018_WFL1/FeatureServer";
-//    	portal = new Portal(url);
-//    	portal.addDoneLoadingListener(this);
-//    	portal.loadAsync();
-    	agmil = new ArcGISMapImageLayer(url);
-    	agmil.addDoneLoadingListener(this);
-    	agmil.loadAsync();
-    }
-
-	@Override
-	public void run() {
-		LoadStatus ls = agmil.getLoadStatus();
-		List<ServiceFeatureTable> tables = agmil.getTables();
-		for (final ServiceFeatureTable table: tables) {
-			table.addDoneLoadingListener(new Runnable() {
-
-				@Override
-				public void run() {
-					info(table.getDisplayName());
-				}
-				
-			});
-			table.loadAsync();
-		}
-	}
 
 }
