@@ -1,12 +1,24 @@
 import groovy.json.JsonSlurper
 
 apply plugin: 'java'
+apply plugin: 'eclipse'
 apply plugin: 'application'
+//apply the ArcGIS Java SDK Plug-in for Gradle With_3D-Add_Graphics-Surface_Placement
+apply plugin: 'com.esri.arcgisruntime.java'
 
 group 'org.iot-dsa'
 mainClassName = 'org.iot.dsa.dslink.DSLink'
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
+
+
+buildscript {
+    repositories { maven { url 'https://esri.bintray.com/arcgis' } }
+    dependencies { classpath 'com.esri.arcgisruntime:gradle-arcgis-java-plugin:1.0.0' }
+}
+arcgis.version = '100.3.0'
+ // download javadoc
+eclipse.classpath.downloadJavadoc = true
 
 build {
     def inputFile = file('dslink.json')
